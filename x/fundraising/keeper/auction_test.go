@@ -563,12 +563,35 @@ func (s *KeeperTestSuite) TestCalculateAllocation_Many() {
 	s.Require().Equal(mInfo.ReservedMatchedMap[s.addr(3).String()], sdk.NewInt(0))
 	s.Require().Equal(mInfo.RefundMap[s.addr(1).String()], sdk.NewInt(50_000_000))
 
+	// When using Abs(), this is passed.
 	s.Require().Equal(mInfo.RefundMap[s.addr(2).String()].Abs(), sdk.NewInt(0).Abs())
 
-	fmt.Println(mInfo.RefundMap[s.addr(2).String()], " vs ", sdk.NewInt(0))
-	fmt.Println(reflect.TypeOf(mInfo.RefundMap[s.addr(2).String()]), " vs ", reflect.TypeOf(sdk.NewInt(0)))
+	// However, if we compare the variables,...
+	fmt.Println(mInfo.RefundMap[s.addr(2).String()], " vs ", sdk.NewInt(0))                                 // 	0  vs  0
+	fmt.Println(reflect.TypeOf(mInfo.RefundMap[s.addr(2).String()]), " vs ", reflect.TypeOf(sdk.NewInt(0))) // types.Int  vs  types.Int
 
+	// This line makes an error.
 	s.Require().Equal(mInfo.RefundMap[s.addr(2).String()], sdk.NewInt(0))
+
+	// 	0  vs  0
+	// types.Int  vs  types.Int
+	// --- FAIL: TestKeeperTestSuite (0.19s)
+	//     --- FAIL: TestKeeperTestSuite/TestCalculateAllocation_Many (0.00s)
+	//         auction_test.go:571:
+	//                 Error Trace:    auction_test.go:571
+	//                 Error:          Not equal:
+	//                                 expected: types.Int{i:(*big.Int)(0xc0013ce940)}
+	//                                 actual  : types.Int{i:(*big.Int)(0xc0013ceb80)}
+
+	//                                 Diff:
+	//                                 --- Expected
+	//                                 +++ Actual
+	//                                 @@ -3,4 +3,3 @@
+	//                                    neg: (bool) false,
+	//                                 -  abs: (big.nat) {
+	//                                 -  }
+	//                                 +  abs: (big.nat) <nil>
+	//                                   })
 
 	s.Require().Equal(mInfo.RefundMap[s.addr(3).String()], sdk.NewInt(400_000_000))
 
