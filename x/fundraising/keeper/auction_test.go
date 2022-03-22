@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"fmt"
+	"reflect"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -560,7 +562,14 @@ func (s *KeeperTestSuite) TestCalculateAllocation_Many() {
 	s.Require().Equal(mInfo.ReservedMatchedMap[s.addr(2).String()], sdk.NewInt(450_000_000))
 	s.Require().Equal(mInfo.ReservedMatchedMap[s.addr(3).String()], sdk.NewInt(0))
 	s.Require().Equal(mInfo.RefundMap[s.addr(1).String()], sdk.NewInt(50_000_000))
+
 	s.Require().Equal(mInfo.RefundMap[s.addr(2).String()].Abs(), sdk.NewInt(0).Abs())
+
+	fmt.Println(mInfo.RefundMap[s.addr(2).String()], " vs ", sdk.NewInt(0))
+	fmt.Println(reflect.TypeOf(mInfo.RefundMap[s.addr(2).String()]), " vs ", reflect.TypeOf(sdk.NewInt(0)))
+
+	s.Require().Equal(mInfo.RefundMap[s.addr(2).String()], sdk.NewInt(0))
+
 	s.Require().Equal(mInfo.RefundMap[s.addr(3).String()], sdk.NewInt(400_000_000))
 
 	// Distribute selling coin
